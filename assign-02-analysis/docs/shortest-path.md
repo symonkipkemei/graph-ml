@@ -1,118 +1,39 @@
-# Shortest Path Between Rooms — Process Documentation
+# Shortest Path Between Rooms
 
-## What It Does
-Computes the shortest traversal path between any two rooms in the building using the circulation graph. `Graph.ShortestPath` returns the exact sequence of rooms an occupant must pass through — connected only by real door and window apertures. No solid walls are crossed.
+## The Problem
 
-This directly answers **Goal 1** from the report: how does an occupant move from point A to point B?
+A building is only useful if its occupants can move through it. The design question is not just whether rooms exist, but whether they are reachable — and at what cost. Given any two rooms in the Box House, what is the minimum sequence of spaces an occupant must pass through to travel from one to the other, using only actual doors and windows?
 
----
-
-## Geometry Preparation (Rhino)
-
-| File | Contents |
-|------|----------|
-| `box-house-rooms.obj` | All room volumes as a single merged surface model |
-| `box-house-doors.obj` | Door opening surfaces only |
-| `box-house-windows.obj` | Window opening surfaces only |
-
-Same geometry as Assignment 01. No additional files are needed.
+This is a wayfinding problem. It cannot be answered by looking at the floor plan alone, because floor plan adjacency does not guarantee passage. Two rooms can share a wall with no opening between them. The question requires a model of movement, not just a model of space.
 
 ---
 
-## Notebook Pipeline
+## Why This Approach
 
-### Step 1 — Load Geometry
-```python
-objects = Topology.ByOBJPath("box-house-rooms.obj", selfMerge=True)
-doors   = Topology.ByOBJPath("box-house-doors.obj",   selfMerge=True)
-windows = Topology.ByOBJPath("box-house-windows.obj", selfMerge=True)
-```
-Aperture clusters are flattened to individual faces and colour-coded (`"brown"` for doors, `"cyan"` for windows).
+The circulation graph encodes the building's movement network exactly. Each node is a room. Each edge exists only where a registered aperture — a door or window — sits on the shared wall between two rooms. There are no hypothetical shortcuts; the graph reflects the actual openings modelled in Rhino.
 
-### Step 2 — Build CellComplex and Add Apertures
-```python
-cells = Topology.Cells(objects[0])
-cc = CellComplex.ByCells(cells)
-cc = Topology.RemoveCoplanarFaces(cc)
-cc = Topology.RemoveCollinearEdges(cc)
-cc = Topology.AddApertures(cc, aperture_faces, subTopologyType="face")
-```
+Shortest path on this graph finds the minimum-hop route through the aperture network. It answers the wayfinding question structurally: not the shortest straight-line distance through walls, but the fewest room transitions through real openings. The result is a sequence of rooms that mirrors what an occupant would actually experience walking through the building.
 
-### Step 3 — Build Circulation Graph
-```python
-g_circ = Graph.ByTopology(cc,
-                           direct=False,
-                           viaSharedApertures=True,
-                           toExteriorApertures=False)
-```
-Rooms connect only through aperture-bearing shared faces. Exterior openings are excluded here — they are handled in A02-03.
-
-### Step 4 — Inspect Vertices
-```python
-g_verts = Graph.Vertices(g_circ)
-for i, v in enumerate(g_verts):
-    print(i, v.X(), v.Y(), v.Z())
-```
-Each vertex is one room centroid. Because `box-house-rooms.obj` has no named groups, rooms are identified by index only. The coordinate table is used to select meaningful start and end rooms.
-
-### Step 5 — Compile Routing Graph and Find Shortest Path
-```python
-crg = Graph.CompiledRoutingGraph(g_circ, precomputeTurns=False)
-shortest_path = Graph.ShortestPath(crg, vertexA=start_v, vertexB=end_v)
-```
-`CompiledRoutingGraph` pre-processes the graph into a structure optimised for repeated queries. `ShortestPath` returns a `Wire` — a sequence of edges connecting the centroids of the rooms along the route.
-
-Path metrics are derived from the returned wire:
-```python
-hops   = len(Topology.Edges(shortest_path))   # number of room transitions
-length = Wire.Length(shortest_path)            # Euclidean centroid-to-centroid sum
-```
-
-### Step 6 — Visualise
-```python
-# Start node: green, size 20
-# End node:   blue,  size 20
-# Path edges: yellow, width 6
-# Other edges: grey, width 2
-Topology.Show(cc, ap_cluster, g_circ, shortest_path, ...)
-```
-
-### Step 7 — Batch Query Multiple Pairs
-```python
-for (a_idx, b_idx) in pairs:
-    path = Graph.ShortestPath(crg, vertexA=g_verts[a_idx], vertexB=g_verts[b_idx])
-```
-The compiled routing graph `crg` is reused across all queries, avoiding the overhead of recompiling for each pair.
+The batch analysis — querying multiple room pairs in one pass — builds a picture of travel distances across the whole building. Some pairs of rooms are one or two transitions apart; others may require traversing several intermediate spaces. This variation is not visible from the floor plan.
 
 ---
 
-## Key Lessons Learned
+## Findings
 
-1. **`Graph.CompiledRoutingGraph` is required for `Graph.ShortestPath`** — `ShortestPath` accepts a compiled routing graph object, not the raw `Graph` directly. The compile step pre-builds internal data structures for efficient traversal.
+The shortest path analysis on the Box House reveals the depth structure of the building — how many spaces separate any two rooms when movement is constrained to real openings.
 
-2. **`ShortestPath` returns a `Wire`, not a vertex list** — The path is a topological `Wire` object. Use `Topology.Edges(path)` to count hops and `Wire.Length(path)` for Euclidean distance.
+**Connectivity** — Not every room can reach every other room. Rooms on separate floors appear as isolated nodes in the graph because stair connections are not modelled as apertures. Any pair involving an upper-floor room returns no path, confirming that the graph currently models only horizontal circulation within each floor.
 
-3. **`None` return means no path exists** — If the two rooms are not connected through any chain of apertures (disconnected graph component or isolated room), `ShortestPath` returns `None`. Always check before accessing path properties.
+**Travel depth** — Within a connected floor, the maximum path between any two rooms is a measure of how labyrinthine the layout is. A shallow building (low maximum hops) means all rooms are close to each other through the aperture network. A deep building means some rooms are effectively remote even if they appear spatially adjacent on the floor plan.
 
-4. **Vertex selection by index, not coordinate** — Room nodes have no names. The inspect step (vertex index + coordinates table) is required before every analysis to map physical rooms to graph indices.
-
-5. **`CompiledRoutingGraph` is reusable** — Compile once, query many times. For the batch multi-pair analysis, the same `crg` is used for all pairs without recompiling.
+**Disconnected rooms** — Any room that returns `None` for all path queries has no aperture-connected route to the rest of the building. This is a modelling flag: either the room genuinely has no door (an enclosed space), or an aperture was not registered correctly during geometry preparation.
 
 ---
 
-## Shortcomings
+## Limitations
 
-### 1. No Room Name Labels
-`box-house-rooms.obj` has no `g RoomName` group entries. Path output is `0 → 3 → 7 → 12`, not `bedroom → corridor → living room → kitchen`. A manual index-to-name mapping must be maintained separately.
+The path length reported is Euclidean centroid-to-centroid distance — a topological approximation, not a measured walking distance. It does not account for where within a wall a door is placed, or the detour required to reach a door offset from the room centre.
 
-### 2. Euclidean Length is Not Walking Distance
-`Wire.Length` sums the straight-line distances between room centroids. It does not account for the actual door position within the wall or the detour required to reach a door that is offset from the room centre. It is a topological approximation, not an architectural measurement.
+All transitions are treated as equal regardless of opening type or width. The path does not distinguish between a wide corridor opening and a narrow bathroom door.
 
-### 3. Multi-Floor Paths Are Broken
-Stair connections between floors require apertures on horizontal shared faces (floor/ceiling openings). These are not modelled. Rooms on upper floors appear as disconnected nodes or isolated components, and `ShortestPath` returns `None` for any cross-floor query.
-
-### 4. No Edge Weights
-All edges are treated as equally traversable. A narrow bathroom door and a wide open archway produce identical edges. Weighted shortest path (e.g. by door width or shared face area) is not implemented.
-
-### 5. Hops Undercount Actual Transitions
-Each edge in the path represents a room-to-room connection. If two rooms are connected through multiple stacked apertures (a door and a window on the same wall), only one edge appears in the graph — the hop count does not reflect the number of distinct openings available at each step.
+Room nodes carry no names. Path output is expressed as vertex indices (`0 → 3 → 7 → 12`), not room labels. Interpretation requires cross-referencing the vertex coordinate table with the building model.

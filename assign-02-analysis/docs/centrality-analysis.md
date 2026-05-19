@@ -1,117 +1,41 @@
-# Centrality Analysis — Process Documentation
+# Centrality Analysis
 
-## What It Does
-Applies two graph centrality metrics to the circulation graph to characterise the spatial role of each room within the building's movement network:
+## The Problem
 
-| Metric | Question answered | Space syntax equivalent |
-|--------|------------------|------------------------|
-| **Closeness centrality** | Which room is easiest to reach from everywhere else? | Global integration |
-| **Betweenness centrality** | Which rooms lie on the most shortest paths? | Choice |
+In any building, some rooms matter more to circulation than others. A corridor that connects three wings is not equivalent to a bedroom at the end of a dead-end passage — even if both appear as single nodes on the graph. The design question is: which rooms are structurally central to the movement network, and which rooms would cause the most disruption if they were removed or blocked?
 
-A high closeness score identifies rooms that are topologically shallow — reachable quickly from any other room. A high betweenness score identifies structural hub rooms whose removal would most disrupt circulation through the building.
+This is not a question about geometry. Two rooms can be physically close together but topologically distant if the aperture network routes movement around them. Centrality measures the position of each room within the network of real circulation connections — not its position in space.
 
 ---
 
-## Geometry Preparation (Rhino)
+## Why This Approach
 
-| File | Contents |
-|------|----------|
-| `box-house-rooms.obj` | All room volumes as a single merged surface model |
-| `box-house-doors.obj` | Door opening surfaces only |
-| `box-house-windows.obj` | Window opening surfaces only |
+Two complementary metrics are applied to the circulation graph:
 
-Same geometry as Assignment 01.
+**Closeness centrality** measures how quickly each room can be reached from all other rooms. A high closeness score means the room is topologically shallow — an occupant starting anywhere in the building reaches it in few transitions. In space syntax terms this is *integration*: the most integrated room is where movement naturally converges. It is the spatial candidate for shared or public functions — a corridor junction, a lobby, a kitchen.
 
----
+**Betweenness centrality** measures how often each room lies on the shortest path between other pairs of rooms. A high betweenness score means most routes through the building pass through that room. It is structurally indispensable: blocking it would force many occupants to take longer routes or lose connectivity entirely. In space syntax terms this is *choice*: the room that carries the most through-movement.
 
-## Notebook Pipeline
-
-### Step 1 — Load Geometry and Build Circulation Graph
-Same setup as A02-01: load OBJ files, flatten apertures, build CellComplex, register apertures, and build the circulation graph with `direct=False, viaSharedApertures=True, toExteriorApertures=False`.
-
-### Step 2 — Closeness Centrality
-```python
-cc_values = Graph.ClosenessCentrality(g_circ, colorScale="thermal")
-```
-`Graph.ClosenessCentrality` computes the reciprocal of the mean shortest-path distance from each node to all reachable nodes. It writes two keys to each vertex dictionary:
-- `"closeness_centrality"` — the numeric score
-- `"cc_color"` — a hex colour string mapped from the score on the chosen colour scale
-
-The return value is a list of numeric scores, one per vertex, in the same order as `Graph.Vertices(g_circ)`.
-
-Results are printed with the most and least central rooms flagged:
-```python
-best_i  = cc_values.index(max(cc_values))   # most central room
-worst_i = cc_values.index(min(cc_values))   # least central room
-```
-
-### Step 3 — Visualise Closeness
-```python
-Topology.Show(cc, g_circ,
-              vertexSize=18,
-              vertexColorKey="cc_color",
-              ...)
-```
-The `cc_color` key written by `ClosenessCentrality` is passed directly as `vertexColorKey`. No manual colour mapping is needed.
-
-### Step 4 — Betweenness Centrality
-```python
-bc_values = Graph.BetweennessCentrality(g_circ, normalize=True, colorScale="thermal")
-```
-`normalize=True` scales scores to the range [0, 1], making them comparable across graphs of different sizes. Two keys are written per vertex:
-- `"betweenness_centrality"` — the numeric score
-- `"bc_color"` — a hex colour string
-
-### Step 5 — Visualise Betweenness
-```python
-Topology.Show(cc, g_circ,
-              vertexSize=18,
-              vertexColorKey="bc_color",
-              ...)
-```
-
-### Step 6 — Side-by-Side Comparison
-```python
-combined = sorted(
-    zip(range(len(cc_values)), cc_values, bc_values),
-    key=lambda x: x[1],
-    reverse=True
-)
-```
-Rooms are sorted by closeness (descending) and printed alongside their betweenness score. Rooms that rank high on both metrics are the most spatially critical — they are both accessible and heavily used as transit points.
+The two metrics ask different questions and do not always agree. A room can be highly integrated (easy to reach) without being a transit hub (carrying through-movement), and vice versa. Comparing both together identifies the rooms that are critical on both dimensions — the true spatial backbone of the building.
 
 ---
 
-## Key Lessons Learned
+## Findings
 
-1. **`ClosenessCentrality` and `BetweennessCentrality` write colour keys directly to vertices** — After calling either function, the `cc_color` or `bc_color` key is available on every vertex dictionary. `Topology.Show` can use these keys directly via `vertexColorKey` without any manual colour assignment.
+The centrality analysis on the Box House reveals the implicit spatial hierarchy of the layout — the rooms the design has made structurally important, regardless of their intended function.
 
-2. **`normalize=True` in `BetweennessCentrality` is important for small graphs** — Raw betweenness counts can be very small on a 19-node graph (maximum possible paths is limited). Normalising scales the scores to [0, 1], making the relative differences between rooms legible.
+**Most integrated room (closeness)** — The room with the highest closeness score is the most accessible point in the building. Every other room is, on average, fewer transitions away from it than from any other node. This room is the building's topological centre. If the layout is well designed, this should be a corridor or shared living space. If it turns out to be a private room, the layout has buried its centre in the wrong place.
 
-3. **Disconnected components affect closeness** — If the graph has isolated rooms (no aperture connections to the rest), closeness centrality returns `0` for those nodes. They are unreachable from the main network and appear as cold nodes on the thermal scale.
+**Hub room (betweenness)** — The room with the highest betweenness score is the one that most paths pass through. It is the structural bottleneck of the building. Occupants moving between any two rooms on opposite sides of the layout are likely to pass through it. This room carries the most latent circulation pressure and should be generous in size and unobstructed — it is functioning as an informal corridor whether or not it was designed as one.
 
-4. **Both metrics operate on the unweighted graph** — All edges are treated as having equal cost. This makes the scores reflect topological depth (hop count), not physical walking distance.
+**Isolated rooms** — Rooms with a closeness score of zero are unreachable from the rest of the network through the aperture graph. These appear as cold nodes on the thermal visualisation. They are either intentionally enclosed spaces or the result of missing aperture registrations in the model.
 
-5. **High closeness ≠ high betweenness** — A room can be spatially central without being a structural hub (e.g. a well-connected room in a cluster where many alternative paths exist). Cross-referencing both metrics is needed to identify the most architecturally critical spaces.
+**Comparing closeness and betweenness** — Rooms that rank high on both metrics are the most architecturally critical spaces in the building. Rooms that rank high on closeness but low on betweenness are well-placed but not transit-critical — they are accessible without being indispensable. Rooms that rank high on betweenness but low on closeness are structural bottlenecks located in a less central part of the layout — a narrow corridor connecting two otherwise separate zones.
 
 ---
 
-## Shortcomings
+## Limitations
 
-### 1. Unweighted Graph Ignores Physical Distance
-Both metrics are computed on an unweighted graph. A room one hop away across a long corridor and a room one hop away through a doorway immediately adjacent are treated identically. Adding edge weights (e.g. door-to-door Euclidean distance) would produce architecturally more meaningful centrality scores.
+Both metrics are computed on an unweighted graph. All aperture connections are treated as equal regardless of door width, corridor length, or traversal difficulty. A more architecturally faithful analysis would weight edges by the Euclidean distance between room centroids, making the scores reflect physical travel effort rather than hop count.
 
-### 2. No Room Labels
-All centrality output is by vertex index only. The scores cannot be mapped to room types (corridor, bedroom, kitchen) without a manual index-to-name table, which the current OBJ export does not provide.
-
-### 3. Small Graph — Relative Differences May Be Subtle
-With 19 nodes, the range of both metrics may be narrow. Rooms in a regular grid-like layout will cluster tightly in centrality score, making it difficult to draw strong conclusions about individual rooms.
-
-### 4. Disconnected Nodes Skew Closeness
-Rooms that have no aperture connections (isolated nodes) receive a closeness score of `0`. This drags the minimum down and compresses the visible range for the thermal colour scale, making differences between connected rooms harder to read visually.
-
-### 5. Betweenness Ignores Flow Direction
-Betweenness centrality counts all-pairs shortest paths equally. It does not account for the actual frequency or directionality of movement in the building (e.g. all occupants entering from one direction). A flow-weighted analysis would require observed or modelled movement data.
-
-### 6. Multi-Floor Analysis Not Possible
-Without stair apertures, upper-floor rooms form isolated components. Centrality is computed only within each connected component, so cross-floor comparisons are not meaningful.
+The analysis is limited to connected components. Rooms on separate floors appear as isolated nodes and receive scores that are not comparable to ground-floor rooms. A complete multi-floor centrality analysis requires stair apertures to be modelled.
