@@ -4,3 +4,6 @@ _notes_/
 _docs_
 _notebooks_
 _notes_
+venv/
+__pycache__/
+.claude/
