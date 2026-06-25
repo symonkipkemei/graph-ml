@@ -7,3 +7,5 @@ _notes_
 venv/
 __pycache__/
 .claude/
+_outdated_
+instructions
