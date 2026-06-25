@@ -1,5 +1,20 @@
 # Execution Proposal: Graph Learning Pipeline for Architectural Floor Plans
 
+## Why we are doing this
+
+Architecture is fundamentally relational — a bedroom only makes sense because it connects to a corridor, which connects to a living room, which connects to a staircase. Drawings and 3D models capture geometry, but they don't capture this relational logic in a form a computer can reason about. Graphs do.
+
+This project demonstrates the full pipeline: from a real building design, through graph construction, to a machine learning model that infers room function purely from graph structure — no geometry, no areas, no coordinates. Just connectivity.
+
+The central question is: **can a model trained on 500 Swiss apartment graphs correctly classify the rooms in a building it has never seen?** If it can, that confirms that graph topology alone carries enough architectural meaning to be useful. If it partially fails, the errors themselves are informative — they reveal which room types are structurally ambiguous and why.
+
+The three things the presentation needs to show:
+1. That we understood how to translate a physical building into a graph representation that matches the MSD dataset schema
+2. That graph metrics reveal something meaningful about the spatial organisation of the building
+3. That we can run and interpret a GNN inference result — including honest analysis of where and why the model is wrong
+
+---
+
 ## What changed from `_outdated_`
 
 | Old (FA notebooks) | New (NC notebooks) | Why |
@@ -11,24 +26,35 @@
 
 ---
 
-## New Folder Structure
+## Folder Structure
 
 ```
-aasing-04-node-classification/
-  msd_node_classifier.pt              ← copied locally (github-ready)
+assign-04-node-classification/
+  execution.md
+  instructions/
+    instructions-1.txt
+    instructions-2.txt
+    instructions-3.txt
+    dataset.txt
+  model/
+    msd_node_classifier.pt            ← pretrained model, tracked in git
+  geometry/                           ← OBJ exports from Rhino (inputs)
+    rooms.obj
+    apertures.obj
   notebooks/
     NC_01_rhino_to_cellcomplex.ipynb  ← manual prep + import from Rhino
     NC_02_graph_construction.ipynb    ← CellComplex → Graph → CSV export
     NC_03_spatial_analysis.ipynb      ← graph metrics + interpretation
     NC_04_node_classification.ipynb   ← inference with pretrained model
-  our_graph/                          ← output from NC_02
+  graphs/                          ← CSV outputs from NC_02
     graphs.csv
     nodes.csv
     edges.csv
     floor_plan_meta.json
-  outputs/                            ← outputs from NC_03 + NC_04
+  outputs/                            ← analysis outputs from NC_03 + NC_04
     spatial_analysis.json
     node_predictions.csv
+  _outdated_/                         ← archived previous attempt
 ```
 
 ---
@@ -77,7 +103,7 @@ from topologicpy.Cluster import Cluster
 from topologicpy.Dictionary import Dictionary
 
 # --- Import room geometry ---
-rooms_raw = Topology.ByOBJPath(r"geometry/rooms.obj", transposeAxes=False)
+rooms_raw = Topology.ByOBJPath(r"E:\softwares-4\graph-ml\assign-04-node-classification\geometry\rooms.obj", transposeAxes=False)
 
 # Build CellComplex from merged room solids
 all_cells = []
@@ -102,7 +128,7 @@ for obj in rooms_raw:
 cc = Topology.TransferDictionariesBySelectors(cc, selectors, tranCells=True)
 
 # --- Import apertures and assign door_type ---
-apertures_raw = Topology.ByOBJPath(r"geometry/apertures.obj", transposeAxes=False)
+apertures_raw = Topology.ByOBJPath(r"E:\softwares-4\graph-ml\assign-04-node-classification\geometry\apertures.obj", transposeAxes=False)
 aperture_faces = []
 for obj in apertures_raw:
     layer_name = ...  # parse from OBJ group name — must be passage/door/entrance_door
@@ -180,15 +206,15 @@ summary = CheckMSDGraphPreparation(graph)   # must show 0 unsupported types
 graph = EncodeMSDGraphFeatures(graph)
 
 # 4. Export to CSV
-Graph.ExportToCSV(graph, path=r"our_graph/", overwrite=True)
+Graph.ExportToCSV(graph, path=r"graphs/", overwrite=True)
 
 # 5. Post-process: add inference masks (all nodes are test-only)
 import pandas as pd
-nodes = pd.read_csv("our_graph/nodes.csv")
+nodes = pd.read_csv("graphs/nodes.csv")
 nodes["train_mask"] = False
 nodes["val_mask"]   = False
 nodes["test_mask"]  = True
-nodes.to_csv("our_graph/nodes.csv", index=False)
+nodes.to_csv("graphs/nodes.csv", index=False)
 ```
 
 **Verify exported schema matches reference `dataset_node_classification/nodes.csv`:**
@@ -206,7 +232,7 @@ train_mask, val_mask, test_mask
 **Goal:** Run four graph metrics on the floor plan, interpret spatially.
 
 **Workflow:**
-1. Reload graph: `Graph.ByCSVPath(path="our_graph/")`
+1. Reload graph: `Graph.ByCSVPath(path="graphs/")`
 2. Convert to NetworkX undirected graph via adjacency extraction
 3. Compute:
    - `nx.degree_centrality(G)` — connectivity richness per room
@@ -231,8 +257,8 @@ train_mask, val_mask, test_mask
 
 **Paths — model is now local to this assignment:**
 ```python
-DATASET_PATH = Path(r"E:\softwares-4\graph-ml\aasing-04-node-classification\our_graph")
-MODEL_PATH   = Path(r"E:\softwares-4\graph-ml\aasing-04-node-classification\msd_node_classifier.pt")
+DATASET_PATH = Path(r"E:\softwares-4\graph-ml\assign-04-node-classification\graphs")
+MODEL_PATH   = Path(r"E:\softwares-4\graph-ml\assign-04-node-classification\model\msd_node_classifier.pt")
 ```
 
 **Workflow (mirrors S06-15C exactly):**
@@ -266,6 +292,116 @@ MODEL_PATH   = Path(r"E:\softwares-4\graph-ml\aasing-04-node-classification\msd_
 
 ---
 
+## Step 5 — Scale to Multiple CellComplexes (after single-graph run is verified)
+
+**Prerequisite:** Steps 1–4 completed and NC_04 produces valid predictions for the single sample graph.
+
+**Goal:** Extend the dataset to multiple CellComplexes (e.g. one per floor, one per apartment block) so the pretrained model classifies each independently and results can be compared across units.
+
+**Why this works:** The CSV schema uses `graph_id` to separate graphs. `PyG.ByCSVPath()` and the pretrained model both handle any number of graphs transparently. The S06-15C visualisation cell uses `graphs[i]` — swap `graphs[0]` for a loop over all graphs.
+
+**Workflow — add to `NC_02_graph_construction.ipynb`:**
+
+```python
+import pandas as pd
+from pathlib import Path
+
+cell_complexes = [cc_floor1, cc_floor2]  # add as many as needed
+
+graphs_dfs, nodes_dfs, edges_dfs = [], [], []
+
+for i, cc in enumerate(cell_complexes):
+    graph = Graph.ByTopology(cc, direct=False, directApertures=True)
+    graph = EncodeMSDGraphFeatures(graph)
+    temp_path = Path(f"temp/graph_{i}")
+    temp_path.mkdir(parents=True, exist_ok=True)
+    Graph.ExportToCSV(graph, path=str(temp_path), overwrite=True)
+
+    g = pd.read_csv(temp_path / "graphs.csv")
+    n = pd.read_csv(temp_path / "nodes.csv")
+    e = pd.read_csv(temp_path / "edges.csv")
+
+    # ExportToCSV writes graph_id=0 each time — reassign to unique id
+    g["graph_id"] = i
+    n["graph_id"] = i
+    e["graph_id"] = i
+
+    # Add inference masks if not already present
+    for col in ["train_mask", "val_mask", "test_mask"]:
+        if col not in n.columns:
+            n[col] = col == "test_mask"
+
+    graphs_dfs.append(g)
+    nodes_dfs.append(n)
+    edges_dfs.append(e)
+
+pd.concat(graphs_dfs).to_csv("graphs/graphs.csv", index=False)
+pd.concat(nodes_dfs).to_csv("graphs/nodes.csv",  index=False)
+pd.concat(edges_dfs).to_csv("graphs/edges.csv",  index=False)
+```
+
+**Update NC_04 visualisation cell to loop over all graphs:**
+```python
+# Replace single graphs[0] call with a loop
+for i, g in enumerate(graphs):
+    Topology.Show(g, vertexSize=6, vertexSizeKey="size",
+                  vertexColorKey="pred_color",
+                  showVertexLabel=True, vertexLabelKey="pred",
+                  backgroundColor="white", camera=[0,0,3],
+                  vertexLabelFontSize=18)
+```
+
+**Notes:**
+- `node_id` is local per graph (each starts from 0) — the merge is safe
+- Each graph is classified independently — neighbourhood context does not cross CellComplex boundaries
+- For the presentation, side-by-side prediction results across floors/apartments make a strong visual comparison
+
+---
+
+---
+
+## Final Outputs — What to Present
+
+### Floor plan & graph construction
+
+| Output | How to produce | What it shows |
+|---|---|---|
+| 3D render of CellComplex | `Topology.Show(cc)` in TopologicPy or screenshot from Rhino | The physical building — gives the audience a spatial anchor before graphs appear |
+| Graph coloured by room type | `Topology.Show(graph)` with `vertexColorKey="room_type"` | The abstract graph laid out spatially; nodes labelled by room type |
+| Room and edge count table | Print from `floor_plan_meta.json` | Confirms alignment with MSD schema: 9 room types, 3 door types represented |
+
+### Spatial analysis
+
+| Output | How to produce | What it shows |
+|---|---|---|
+| Bar chart — degree centrality per node | `matplotlib` bar, nodes on x-axis, coloured by room type | Which rooms are most physically connected; corridors and stairs should dominate |
+| Bar chart — closeness centrality per node | Same pattern | Which rooms are most reachable; stairs should score highest as inter-floor bridge |
+| Bar chart — clustering coefficient per node | Same pattern | Contrast: high inside apartments (rooms share neighbours), low at stairs (bridge node) |
+| Shortest path heatmap | `seaborn.heatmap` on the all-pairs distance matrix | Visual summary of travel depth; group rows/columns by apartment to show unit boundaries |
+| One-paragraph interpretation | Written in the notebook as markdown | Links each metric to an architectural observation (accessibility, hierarchy, evacuation depth) |
+
+### Node classification
+
+| Output | How to produce | What it shows |
+|---|---|---|
+| True-label graph | `Topology.Show()` with `vertexColorKey="true_color"`, `vertexLabelKey="true"` | Ground truth — what the rooms actually are |
+| Predicted-label graph | Same with `vertexColorKey="pred_color"`, `vertexLabelKey="pred"` | What the model thinks — place side-by-side with the true graph |
+| Confusion matrix | `sklearn.metrics.ConfusionMatrixDisplay` | Which room types are confused with each other; e.g. bedroom vs storeroom |
+| Misclassified node table | Filter `node_predictions.csv` where `y_true != y_pred` | For each error: room type, degree, neighbour types — the raw material for the explanation |
+| Accuracy by room type | Group `node_predictions.csv` by `y_true`, compute correct% | Shows whether structurally distinctive rooms (stairs, balcony) predict better than ambiguous ones (bedroom, storeroom) |
+| Error explanation paragraph | Written analysis | The most important slide — e.g. "bedroom and storeroom are confused because both have degree 1 and connect only to a corridor; the model cannot distinguish them from connectivity alone" |
+
+### Suggested slide order for the presentation
+
+1. Dataset & references — MSD overview, label schema, what the two papers contributed
+2. Floor plan — Rhino 3D render, room programme table, design rationale
+3. Graph construction — CellComplex → graph pipeline diagram, final graph coloured by room type
+4. Spatial analysis — four metric charts, one interpretation paragraph per metric
+5. Node classification — true vs predicted side-by-side, confusion matrix, error table
+6. Discussion — what the errors reveal, what would improve predictions (richer features, larger graph, balcony connectivity), what the pipeline could be used for in practice
+
+---
+
 ## Summary
 
-Four notebooks. NC_01 handles the manual Rhino → CellComplex import (the only step requiring geometry work outside Python). NC_02 builds the graph and exports MSD-compatible CSVs. NC_03 runs spatial analysis. NC_04 runs inference with the pretrained model — no training, no custom model. The pretrained model (`msd_node_classifier.pt`) is stored locally in this folder and tracked in git.
+Four notebooks for the single-graph run (Steps 1–4), then Step 5 scales to multiple CellComplexes once the pipeline is verified end-to-end. The pretrained model (`msd_node_classifier.pt`) is stored locally in this folder and tracked in git.

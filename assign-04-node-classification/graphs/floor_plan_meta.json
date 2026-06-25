@@ -1,0 +1,24 @@
+{
+  "cell_count": 10,
+  "aperture_count": 12,
+  "room_type_counts": {
+    "bedroom": 3,
+    "bathroom": 2,
+    "corridor": 2,
+    "dining": 1,
+    "livingroom": 1,
+    "kitchen": 1
+  },
+  "door_type_counts": {
+    "door": 9,
+    "entrance_door": 3
+  },
+  "notes": {
+    "passage_present": false,
+    "missing_room_types": [
+      "balcony",
+      "stairs",
+      "storeroom"
+    ]
+  }
+}

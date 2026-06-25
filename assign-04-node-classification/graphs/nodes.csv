@@ -1,0 +1,11 @@
+graph_id,node_id,label,train_mask,val_mask,test_mask,feat_feat_zoning_type_0,feat_feat_zoning_type_1,feat_feat_zoning_type_2,feat_feat_zoning_type_3,feat_feat_connectivity_0,feat_feat_connectivity_1,feat_feat_connectivity_2,X,Y,Z
+0,0,7,False,False,True,0.0,0.0,1.0,0.0,0.0,1.0,0.0,6410.993164,740.0,1500.0
+0,1,1,False,False,True,0.0,1.0,0.0,0.0,0.0,1.0,0.0,13310.0,-2260.0,1500.0
+0,2,0,False,False,True,1.0,0.0,0.0,0.0,0.0,1.0,0.0,5810.0,-3760.0,1500.0
+0,3,3,False,False,True,0.0,1.0,0.0,0.0,0.0,1.0,0.0,8810.0,-2260.0,1500.0
+0,4,7,False,False,True,0.0,0.0,1.0,0.0,0.0,1.0,0.0,17810.0,-5260.0,1500.0
+0,5,2,False,False,True,0.0,1.0,0.0,0.0,0.0,1.0,0.0,14810.0,-5260.0,1500.0
+0,6,4,False,False,True,0.0,1.0,0.0,0.0,0.0,1.0,0.0,8810.0,740.0,1500.0
+0,7,0,False,False,True,1.0,0.0,0.0,0.0,0.0,1.0,0.0,20810.0,-4961.986389,1500.0
+0,8,0,False,False,True,1.0,0.0,0.0,0.0,0.0,1.0,0.0,8511.986328,3740.0,1500.0
+0,9,4,False,False,True,0.0,1.0,0.0,0.0,0.0,1.0,0.0,17810.0,-2860.993225,1500.0
