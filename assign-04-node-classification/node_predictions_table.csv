@@ -1,0 +1,11 @@
+node_id,true_label,pred_label,y_pred_prob,correct
+0,bathroom,bedroom,0.9975,False
+1,livingroom,bedroom,0.9975,False
+2,bedroom,bedroom,0.9975,True
+3,dining,bedroom,0.9975,False
+4,bathroom,bedroom,0.9975,False
+5,kitchen,bedroom,0.9975,False
+6,corridor,bedroom,0.9975,False
+7,bedroom,bedroom,0.9975,True
+8,bedroom,bedroom,0.9975,True
+9,corridor,bedroom,0.9975,False
