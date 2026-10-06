@@ -1,37 +1,11 @@
 # Thesis Context — Building Graphs for AEC
 
 > Working context for the thesis research. Keep this file current: it is the starting point for every research session.
-> **Status:** **Research 2 confirmed by Prof. Jabi (2026-10-05); Research 1 closed** · **Time available:** 3 months · **Last updated:** 2026-10-06 · **Context version:** v3 (earlier versions are in [`_archive_/`](_archive_/))
+> **Status:** Two proposals drafted; Proposal 2 (v3) is the most developed · **Time available:** 3 months · **Last updated:** 2026-10-04
 
 ---
 
-## 0. Where we are now (2026-10-06)
-
-**Decision (meeting with Prof. Jabi, 2026-10-05):** go ahead with **Research 2, building brains for delivery**. Research 1 (renovation) is closed and kept as history in section 4. Full synthesis and next steps: [research-2/_feedback_/Feedback synthesis - Jabi (2026-10-05).md](research-2/_feedback_/Feedback%20synthesis%20-%20Jabi%20(2026-10-05).md).
-
-**What Jabi said, in brief:**
-
-- **The aim is endorsed.** "Spot on... pitched at the right level." Rewrite it as one academic sentence. The aim is never the tool: the tool is the means.
-- **Thesis structure:** background → one aim → 4–5 objectives → research questions → step-by-step methodology → research framework diagram → results → discussion → conclusion.
-- **Static and dynamic graphs:** the walls don't change (static graph), while real-time events do (dynamic graph with dynamic route finding).
-- **Prove an agent can work** by vibe-coding multi-agent movement; the VIRIS implementation was "primitive". Jabi wants **an agent in the Topologic toolkit**.
-- **Starting point: Paweł Boguslawski**, fire evacuation and navigable networks in tall buildings.
-- **Widen the horizon:** delivery modes differ (for example, through the window), resilience, Amazon, robots on graphs.
-- **Ambition:** a **journal paper**; long term, a **certification programme** that involves all stakeholders.
-
-### Next steps (full list in the synthesis, section 7)
-
-1. **Prove an agent works:** a minimal multi-agent TopologicPy notebook with one dynamic event and re-routing. Run the VIRIS app and code first.
-2. **Rewrite the aim** in an academic voice and settle 4–5 objectives and their research questions (draft in the synthesis, section 4).
-3. **Get and read Boguslawski** (2015, 2016) and **VIRIS** (Xue et al. 2024).
-4. **Check what TopologicPy can and cannot do** for agents (including the new TGraph layer).
-5. **How delivery works in apartments today**, plus a framework of ideas and a topic wishlist.
-6. **Research framework diagram + pipeline map**, then **Proposal v4** (archive v3 first).
-7. Still blocking: **confirm the data** (multi-storey residential? scan format and registration).
-
----
-
-## 0a. Status on 2026-10-04 (superseded, kept for history)
+## 0. Where we are now (2026-10-04)
 
 | | Proposal 1: Reading the existing (renovation) | Proposal 2: Building brains (last 50 m delivery) |
 |---|---|---|
@@ -100,8 +74,6 @@ Creator of **TopologicPy**. Both options fit his research: **Option 1** through 
 
 ### Option 1: Reading the existing, graph-based impact analysis for renovation design
 
-> **CLOSED (2026-10-05).** Dropped after the meeting with Prof. Jabi; Research 2 goes ahead. Kept below as history. Its renovation angle can return as future work ("renovating for robot readiness").
-
 > **Research question:** Can a building graph help renovation architects read how an existing building is organised, and understand what happens to that organisation when they change it?
 
 - **Primary users:** **renovation architects**, the broader market. They work from a verified as-built model at feasibility and early design stages.
@@ -127,14 +99,6 @@ Creator of **TopologicPy**. Both options fit his research: **Option 1** through 
 - **Outputs:** a readiness map by unit and level, failures and their causes, and a ranked list of changes to the building, compared with existing certification criteria.
 - **Key assumption:** the available data is a **multi-storey residential building** (to confirm).
 - **Full proposal:** [research-2/Proposal - Building Brains.md](research-2/Proposal%20-%20Building%20Brains.md) (v3)
-- **Changes from Jabi's feedback (2026-10-05), going into v4:**
-  - the brain becomes a **static graph + dynamic graph** (real-time events, dynamic route finding)
-  - agents **re-route when the dynamic graph changes**
-  - **several delivery modes** (wheeled, stair-climbing, window or drone, human baseline)
-  - **resilience** under disruption (lift outage, blocked route, fire), building on Boguslawski
-  - an aim in one academic sentence with 4–5 objectives
-  - widen the framework, not the evaluation: test a subset on the real building
-  - see the [synthesis](research-2/_feedback_/Feedback%20synthesis%20-%20Jabi%20(2026-10-05).md)
 
 ### Shared foundation
 
@@ -152,9 +116,7 @@ Both options start from the same thing: a **building graph from the verified Rev
 | Biggest risk | The chat layer grows in scope; access to architects | The data may not be a multi-storey residential building; agent behaviour grows into its own project |
 | **3-month feasibility** | **Good.** The proposals are the change, so no history is needed | **Good.** No hardware, and the data is already in hand |
 
-## 5. Decision: Proposal 2 (confirmed 2026-10-05)
-
-> Confirmed with Prof. Jabi on 2026-10-05. The reasoning below, from 2026-10-04, is kept as history.
+## 5. Current leaning: Proposal 2, not final
 
 Both options remain **feasible in 3 months**, and both fit the supervisor's work. **Proposal 2 is now the stronger candidate:**
 
@@ -196,18 +158,11 @@ The thesis must end with a **working tool that validates the research**. The too
 
 ## 7. Open questions
 
-- [x] **Option 1 or 2.** **Option 2**, confirmed with Prof. Jabi on 2026-10-05.
-- [ ] **Aim:** rewrite as one academic sentence, with 4–5 objectives and their research questions (draft in the synthesis).
-- [ ] **Delivery modes:** which ones does the evaluation cover? Recommendation: wheeled, stair-climber and human baseline, with window/drone as an access node only.
-- [ ] **Static vs dynamic graph:** how is the dynamic layer represented in TopologicPy (edge weights or attributes changing over time, or a separate graph)?
-- [ ] **Agent for TopologicPy:** should it extend VIRIS or be a new module? What API does Jabi want? Is it contributed upstream?
-- [ ] **Boguslawski:** confirm the name and which papers (my notes spell it "Povel Pavalaski").
-- [ ] **Isovist/landmark thesis** Jabi mentioned: get the reference.
-- [ ] **Target journal** for the paper.
-- [ ] Does the thesis have to make a **graph ML** contribution, or is graph analysis enough? (Not raised on 2026-10-05; the emphasis was agents and dynamic graphs.)
+- [ ] **Option 1 or 2.** Confirm the choice (leaning towards Option 2, see section 5).
+- [ ] Does the thesis have to make a **graph ML** contribution, or is graph analysis enough?
 - [ ] How many buildings? Scan format, registration, level of detail?
-- [ ] ~~**Option 1:** is there a **real renovation brief** for this building, or will scenarios be written?~~ (Option 1 closed)
-- [ ] ~~**Option 1:** can I run short sessions with 3–5 **renovation architects**?~~ (Option 1 closed)
+- [ ] **Option 1:** is there a **real renovation brief** for this building, or will scenarios be written?
+- [ ] **Option 1:** can I run short sessions with 3–5 **renovation architects**?
 - [ ] **Option 2:** is the scanned and verified building a **multi-storey residential** building, ideally with multi-level units?
 - [ ] **Option 2:** confirm through the literature and industry sources how indoor delivery robots are deployed today (mapping run for each building? lift integration?)
 - [x] **Option 2:** download and read **Jung et al. (2023)** and **Park & Park (2026)**. Done. Findings:
@@ -216,7 +171,7 @@ The thesis must end with a **working tool that validates the research**. The too
   - Park & Park publish numerical door, lift and passageway standards and **call for robot-navigation simulation** as future work.
   - Notes are in [`research-2/_papers_/README.md`](research-2/_papers_/README.md). These findings are not yet in the proposal (planned for v4).
 - [ ] **Option 2:** find **apartment-specific** evidence on the time spent inside buildings (the UFL figure is from an office tower)
-- [x] Discuss the option choice with Prof. Jabi. Done on 2026-10-05: Option 2. Agent work: improve on VIRIS and add an agent to Topologic.
+- [ ] Discuss the option choice with Prof. Jabi. Ask about reusing his agent simulation work for Option 2, and graph grammars for describing changes in Option 1.
 - [ ] Industry partner? Who will validate the results (for example, renovation architects for Option 1)?
 - [ ] What **form** does the validation tool take: Revit add-in, standalone app, or a pipeline with a simple interface? What does the programme or supervisor require?
 
@@ -241,12 +196,9 @@ Together, the archive, the version tables and the decision log show how the rese
 ```
 _graphs4_/
   thesis-context.md     ← this file: goals, status, decisions
-  _archive_/            ← snapshots of thesis-context and supervisor-context before each change
   supervisor-context.md ← supervisor profile, alignment, meeting log
-  research-1/           ← Option 1 proposal: renovation. CLOSED 2026-10-05, kept as history
-  research-2/           ← Option 2 proposal: last 50 m delivery (v3) + abstract; _archive_/ holds earlier versions;
-                          _papers_/ holds the reference PDFs; _feedback_/ holds supervisor transcripts and notes;
-                          _feedback_/Feedback synthesis - Jabi (2026-10-05).md holds the synthesis, resources and next steps
+  research-1/           ← Option 1 proposal: renovation (archived QAQC draft in _archive_/)
+  research-2/           ← Option 2 proposal: last 50 m delivery (v3); _archive_/ holds v1–v2; _papers_/ holds the reference PDFs and source index
   ...               ← literature reviews, experiments, decisions to come
 ```
 
@@ -266,9 +218,3 @@ _graphs4_/
 | 2026-10-04 | Proposal 2 v2: building brains focused on the **last 50 metres of delivery** in residential buildings | Strategic critique: v1 described a capability, not a problem. Following Jabi et al. (2025), agents became the means and delivery readiness the outcome. Motivated by the user's "delivery is solved up to the doorstep" argument and Smith (2026) |
 | 2026-10-04 | Proposal 2 v3: added evidence for the motivation and repositioned the contribution as an **automated delivery-readiness assessment** | Answers "why deliveries inside apartments?": UFL final 50 feet, NMHC package volumes, lockers push the last 50 m onto residents, and Korea's robot-ready certification shows readiness is assessed by hand today |
 | 2026-10-04 | Current leaning: Proposal 2, not final | Most developed and best evidenced; mirrors the supervisor's paper. Depends on data confirmation and the supervisor meeting |
-| 2026-10-05 | **Research 2 confirmed; Research 1 closed** | Meeting with Prof. Jabi: the aim was called "spot on, pitched at the right level" |
-| 2026-10-05 | The brain becomes **static + dynamic graphs**; agents re-route on dynamic events; several delivery modes; resilience | Jabi's feedback. Starting point: Boguslawski (evacuation in tall buildings); improve on VIRIS agents |
-| 2026-10-05 | Ambition: a journal paper plus a TopologicPy agent; long term, a certification programme | Jabi's feedback. The thesis supplies the evidence base; the programme is future work |
-| 2026-10-06 | Widen the framework, not the evaluation | Balances Jabi's "expand the horizon" against the 3-month limit |
-| 2026-10-06 | Snapshot thesis-context and supervisor-context to `_graphs4_/_archive_/` before each change | Keep the history of how the research develops |
-| 2026-10-06 | LIDAR is background, not a requirement | User correction: Jabi only remarked that robots use LIDAR to find and avoid obstacles. It belongs in the research on how delivery is done today |

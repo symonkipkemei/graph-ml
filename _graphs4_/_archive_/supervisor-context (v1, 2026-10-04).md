@@ -1,7 +1,7 @@
 # Supervisor Context — Prof. Wassim Jabi
 
 > Who my supervisor is, what he works on, and how the thesis can align with his research.
-> **Last updated:** 2026-10-06 · Sources are listed at the bottom. Check details against his LinkedIn and Cardiff profile.
+> **Last updated:** 2026-10-04 · Sources are listed at the bottom. Check details against his LinkedIn and Cardiff profile.
 
 ---
 
@@ -48,7 +48,7 @@
 
 | Date | Discussed | Outcome / actions |
 |---|---|---|
-| 2026-10-05 | Thesis structure (aim, objectives, questions, methodology, framework); my aim; Research 2 direction; VIRIS demo | **Research 2 confirmed, Research 1 dropped.** Aim "spot on": rewrite it academically. Static + dynamic graphs; delivery modes; resilience; start from Boguslawski; vibe-code a multi-agent proof; an agent for Topologic; goal is a journal paper, with a certification programme long term. See [synthesis](research-2/_feedback_/Feedback%20synthesis%20-%20Jabi%20(2026-10-05).md) |
+| | | |
 
 ---
 

@@ -1,0 +1,30 @@
+- Resilience
+- Amazon 
+- Delivery can be done through the window, keep your options open
+- modes of delivery can be different
+- An example of a thesis using isofit to study landmarks in urban areas,people moving towards landmarks. Realtime multimodal
+- Look at Povel Pavalaski fire evacuation in tall buildings. this will be your starting point. he was able to start fires in certain sections and simulate the exit routes and evaution routes using agents
+- Buildings are static in nature, the walls dont change, you will have two sets of graphs, a static one and a dynamic one, the dynamic one will show realtime events and dynamic route finding
+
+
+- Agents following route graphs,find LIDAR they decide whether to go.
+- Expand horion of your thesis abit.LIst of topics ,Robots on graphs
+
+- Vibe code how agents can move within a building, the implementation for virus analysis was quite primitive and before vibe coding stepped in 
+
+- Proof an agent can wotk
+
+- Research journal should be the ultimate goal
+
+TODO
+- Vibe code a multi-agent moving
+- Framework of ideas you are going to investigate
+- Static Graphs vs dynamic graphs
+- Other frameworks in turning NMT to manifold
+- Delivery,look how its done today, in apartments
+- Jabi wants to add an agent as part of the Topology toolkit, take a look at what topology can do or not
+- Document map out how the pipeline is going to be
+- research frameworks
+- The end goal is not just a tool but to develop a certification program where all stakeholders are involved
+- Follow up on the deom displayed by Jabi
+- come up with wishlist of topics to dicuss

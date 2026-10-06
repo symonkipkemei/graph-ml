@@ -48,7 +48,7 @@
 
 | Date | Discussed | Outcome / actions |
 |---|---|---|
-| 2026-10-05 | Thesis structure (aim, objectives, questions, methodology, framework); my aim; Research 2 direction; VIRIS demo | **Research 2 confirmed, Research 1 dropped.** Aim "spot on": rewrite it academically. Static + dynamic graphs; delivery modes; resilience; start from Boguslawski; vibe-code a multi-agent proof; an agent for Topologic; goal is a journal paper, with a certification programme long term. See [synthesis](research-2/_feedback_/Feedback%20synthesis%20-%20Jabi%20(2026-10-05).md) |
+| 2026-10-05 | Thesis structure (aim, objectives, questions, methodology, framework); my aim; Research 2 direction; VIRIS demo | **Research 2 confirmed, Research 1 dropped.** Aim "spot on": rewrite it academically. Static + dynamic graphs; sensing agents; delivery modes; resilience; start from Boguslawski; vibe-code a multi-agent proof; an agent for Topologic; goal is a journal paper, with a certification programme long term. See [synthesis](research-2/Feedback%20synthesis%20-%20Jabi%20(2026-10-05).md) |
 
 ---
 

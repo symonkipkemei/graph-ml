@@ -1,20 +1,20 @@
 # Thesis Context — Building Graphs for AEC
 
 > Working context for the thesis research. Keep this file current: it is the starting point for every research session.
-> **Status:** **Research 2 confirmed by Prof. Jabi (2026-10-05); Research 1 closed** · **Time available:** 3 months · **Last updated:** 2026-10-06 · **Context version:** v3 (earlier versions are in [`_archive_/`](_archive_/))
+> **Status:** **Research 2 confirmed by Prof. Jabi (2026-10-05); Research 1 closed** · **Time available:** 3 months · **Last updated:** 2026-10-06 · **Context version:** v2 (v1 is in [`_archive_/`](_archive_/))
 
 ---
 
 ## 0. Where we are now (2026-10-06)
 
-**Decision (meeting with Prof. Jabi, 2026-10-05):** go ahead with **Research 2, building brains for delivery**. Research 1 (renovation) is closed and kept as history in section 4. Full synthesis and next steps: [research-2/_feedback_/Feedback synthesis - Jabi (2026-10-05).md](research-2/_feedback_/Feedback%20synthesis%20-%20Jabi%20(2026-10-05).md).
+**Decision (meeting with Prof. Jabi, 2026-10-05):** go ahead with **Research 2, building brains for delivery**. Research 1 (renovation) is closed and kept as history in section 4. Full synthesis and next steps: [research-2/Feedback synthesis - Jabi (2026-10-05).md](research-2/Feedback%20synthesis%20-%20Jabi%20(2026-10-05).md).
 
 **What Jabi said, in brief:**
 
 - **The aim is endorsed.** "Spot on... pitched at the right level." Rewrite it as one academic sentence. The aim is never the tool: the tool is the means.
 - **Thesis structure:** background → one aim → 4–5 objectives → research questions → step-by-step methodology → research framework diagram → results → discussion → conclusion.
 - **Static and dynamic graphs:** the walls don't change (static graph), while real-time events do (dynamic graph with dynamic route finding).
-- **Prove an agent can work** by vibe-coding multi-agent movement; the VIRIS implementation was "primitive". Jabi wants **an agent in the Topologic toolkit**.
+- **Agents that sense:** they follow route graphs but use LIDAR-like local sensing to decide whether to go. **Prove an agent can work** by vibe-coding multi-agent movement; the VIRIS implementation was "primitive". Jabi wants **an agent in the Topologic toolkit**.
 - **Starting point: Paweł Boguslawski**, fire evacuation and navigable networks in tall buildings.
 - **Widen the horizon:** delivery modes differ (for example, through the window), resilience, Amazon, robots on graphs.
 - **Ambition:** a **journal paper**; long term, a **certification programme** that involves all stakeholders.
@@ -129,12 +129,12 @@ Creator of **TopologicPy**. Both options fit his research: **Option 1** through 
 - **Full proposal:** [research-2/Proposal - Building Brains.md](research-2/Proposal%20-%20Building%20Brains.md) (v3)
 - **Changes from Jabi's feedback (2026-10-05), going into v4:**
   - the brain becomes a **static graph + dynamic graph** (real-time events, dynamic route finding)
-  - agents **re-route when the dynamic graph changes**
+  - agents gain **local sensing** (LIDAR-like) and re-planning
   - **several delivery modes** (wheeled, stair-climbing, window or drone, human baseline)
   - **resilience** under disruption (lift outage, blocked route, fire), building on Boguslawski
   - an aim in one academic sentence with 4–5 objectives
   - widen the framework, not the evaluation: test a subset on the real building
-  - see the [synthesis](research-2/_feedback_/Feedback%20synthesis%20-%20Jabi%20(2026-10-05).md)
+  - see the [synthesis](research-2/Feedback%20synthesis%20-%20Jabi%20(2026-10-05).md)
 
 ### Shared foundation
 
@@ -246,7 +246,7 @@ _graphs4_/
   research-1/           ← Option 1 proposal: renovation. CLOSED 2026-10-05, kept as history
   research-2/           ← Option 2 proposal: last 50 m delivery (v3) + abstract; _archive_/ holds earlier versions;
                           _papers_/ holds the reference PDFs; _feedback_/ holds supervisor transcripts and notes;
-                          _feedback_/Feedback synthesis - Jabi (2026-10-05).md holds the synthesis, resources and next steps
+                          Feedback synthesis - Jabi (2026-10-05).md holds the synthesis, resources and next steps
   ...               ← literature reviews, experiments, decisions to come
 ```
 
@@ -267,8 +267,7 @@ _graphs4_/
 | 2026-10-04 | Proposal 2 v3: added evidence for the motivation and repositioned the contribution as an **automated delivery-readiness assessment** | Answers "why deliveries inside apartments?": UFL final 50 feet, NMHC package volumes, lockers push the last 50 m onto residents, and Korea's robot-ready certification shows readiness is assessed by hand today |
 | 2026-10-04 | Current leaning: Proposal 2, not final | Most developed and best evidenced; mirrors the supervisor's paper. Depends on data confirmation and the supervisor meeting |
 | 2026-10-05 | **Research 2 confirmed; Research 1 closed** | Meeting with Prof. Jabi: the aim was called "spot on, pitched at the right level" |
-| 2026-10-05 | The brain becomes **static + dynamic graphs**; agents re-route on dynamic events; several delivery modes; resilience | Jabi's feedback. Starting point: Boguslawski (evacuation in tall buildings); improve on VIRIS agents |
+| 2026-10-05 | The brain becomes **static + dynamic graphs**; agents gain local sensing; several delivery modes; resilience | Jabi's feedback. Starting point: Boguslawski (evacuation in tall buildings); improve on VIRIS agents |
 | 2026-10-05 | Ambition: a journal paper plus a TopologicPy agent; long term, a certification programme | Jabi's feedback. The thesis supplies the evidence base; the programme is future work |
 | 2026-10-06 | Widen the framework, not the evaluation | Balances Jabi's "expand the horizon" against the 3-month limit |
 | 2026-10-06 | Snapshot thesis-context and supervisor-context to `_graphs4_/_archive_/` before each change | Keep the history of how the research develops |
-| 2026-10-06 | LIDAR is background, not a requirement | User correction: Jabi only remarked that robots use LIDAR to find and avoid obstacles. It belongs in the research on how delivery is done today |
